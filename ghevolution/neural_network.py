@@ -7,16 +7,16 @@ from math import tanh
 
 sensory_evaluations = {
     # Percent distance from right wall
-    0: (lambda stimuli: stimuli["pos"].x / X_SIZE),
+    0: (lambda pos: pos.x / X_SIZE),
 }
 
 
-def move_left(state):
-    state["pos"].x -= 1
+def move_left(pos):
+    pos.x -= 1
 
 
-def move_right(state):
-    state["pos"].x += 1
+def move_right(pos):
+    pos.x += 1
 
 
 actions = {
@@ -46,23 +46,23 @@ def generate(genes):
 # and recursively calculate the input neurons, memoizing already sensed values
 
 
-def think(brain, stimuli):
+def think(brain, pos):
     actions = []
     for action, sensory in brain.items():
         inputVal = tanh(sum(map(
             # Please refactor this sometime
             lambda id_weight: sensory_evaluations[id_weight[0]](
-                stimuli) * id_weight[1],
+                pos) * id_weight[1],
             sensory)))
         if abs(inputVal) > 0.5:
             actions.append(action)
     return actions
 
 
-def act(action_ids, state):
+def act(action_ids, pos):
     # We pass the state in to mutate
     # it would be better to make it immutable,
     # but that has performance and write implementations
     # the only benefit is using lambdas, which i can't do with mutation
     for id in action_ids:
-        actions[id](state)
+        actions[id](pos)

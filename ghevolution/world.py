@@ -3,6 +3,7 @@ import neural_network
 import genome
 from dataclasses import dataclass
 from settings import *
+import world_view
 
 
 @dataclass
@@ -16,23 +17,28 @@ test_genome = [
 ]
 
 
-def start_generation():
-    gen_info = []
+def start_generation(genes, should_display=False):
+    genes = list(set(genes))
+    brains = []
+    positions = []
     for i in range(NUM_ORGANISMS):
-        brain = neural_network.generate(genome.encode(test_genome))
-        state = {
-            "pos": Point(randrange(0, X_SIZE), randrange(0, Y_SIZE))
-        }
-        gen_info.append((brain, state))
+        brains.append(neural_network.generate(genome.encode(test_genome)))
+        positions.append(Point(randrange(0, X_SIZE), randrange(0, Y_SIZE)))
+
+    if should_display:
+        screen = world_view.init_display()
 
     for i in range(STEPS_PER_GEN):
-        step(gen_info, i)
+        step(brains, positions, i)
+        if should_display:
+            world_view.update_display(screen, positions)
 
 
-def step(gen_info, i):
-    update_org(gen_info[i][0], gen_info[i][1])
+def step(brains, positions, _step_num):
+    for brain, pos in zip(brains, positions):
+        update_org(brain, pos)
 
 
-def update_org(brain, state):
+def update_org(brain, pos):
     # first think, then act on it, updating the state
-    neural_network.act(neural_network.think(brain, state), state)
+    neural_network.act(neural_network.think(brain, pos), pos)
