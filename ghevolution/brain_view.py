@@ -2,23 +2,29 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import actions
 import senses
+import neural_network
 
 options = {
-    'node_color': 'yellow',
-    'node_size': 300,
+    'node_size': 750,
     'width': 3,
     'arrows': True,
     'with_labels': True,
 }
 
 
-def draw_brain(brain):
+def draw_brain(gene):
+    brain = neural_network.generate(gene)
     g = nx.DiGraph()
     for to_id, inputs in brain.items():
         for from_id, weight in inputs:
             g.add_edge(senses.display_names[senses.Senses(from_id)], actions.display_names[actions.Actions(
                 to_id)], weight=weight)
-
-    plt.subplot(121)
-    nx.draw_planar(g, **options)
+    colors = []
+    for node in g:
+        if node in senses.display_names.values():
+            colors.append('yellow')
+        else:
+            colors.append('red')
+    plt.subplot(1, 2, 1)
+    nx.draw_planar(g, node_color=colors, **options)
     plt.savefig('brain_graph.png')

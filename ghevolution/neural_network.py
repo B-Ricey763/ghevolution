@@ -7,10 +7,7 @@ from math import tanh
 from settings import *
 
 
-def generate(genes, dontMutate=False):
-    # There is a small chance the genes will mutate
-    if random() < MUTATION_CHANCE and not dontMutate:
-        genes = genome.mutate(genes)
+def generate(genes):
 
     brain = dict()
     for (from_num, to_num, raw_weight) in genome.decode(genes):
