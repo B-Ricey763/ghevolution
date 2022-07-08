@@ -10,6 +10,8 @@ numpy = "^1.23.0"
 bitarray = "^2.5.1"
 bitstruct = "^8.15.1"
 pygame = "^2.1.2"
+networkx = "^2.8.4"
+matplotlib = "^3.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

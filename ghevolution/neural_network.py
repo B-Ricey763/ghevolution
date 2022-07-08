@@ -1,40 +1,29 @@
-from ctypes.wintypes import SIZE
-from turtle import pos
+from random import random
 import genome
-import enum
+from actions import Actions
+from senses import Senses, sense_funcs
 from settings import *
 from math import tanh
-
-sensory_evaluations = {
-    # Percent distance from right wall
-    0: (lambda pos: pos.x / X_SIZE),
-}
+from settings import *
 
 
-def move_left(pos):
-    pos.x -= 1
+def generate(genes, dontMutate=False):
+    # There is a small chance the genes will mutate
+    if random() < MUTATION_CHANCE and not dontMutate:
+        genes = genome.mutate(genes)
 
-
-def move_right(pos):
-    pos.x += 1
-
-
-actions = {
-    0: move_left,
-    1: move_right,
-}
-
-
-def generate(genes):
-    brain = {}
-    for (_, from_id, _, to_id, raw_weight) in genome.decode(genes):
+    brain = dict()
+    for (from_num, to_num, raw_weight) in genome.decode(genes):
         weight = raw_weight / WEIGHT_DIV
+        # last couple indicies reserved for the inner neurons
+        # this way we can simplify genes
+        # find good way to do this
+        from_id = from_num % len(Senses)
+        to_id = to_num % len(Actions)
         # Lazy initialization of dict keys to keep graph small
-        # We make our keys the action neurons to be easier
-        if from_id not in brain:
-            brain[to_id] = [(from_id, weight)]
-        else:
-            brain[to_id].append((from_id, weight))
+        if to_id not in brain:
+            brain[to_id] = set()
+        brain[to_id].add((from_id, weight))
     return brain
 
 # when we think, we want to evaluate the relevant stimuli
@@ -47,22 +36,15 @@ def generate(genes):
 
 
 def think(brain, pos):
+    def get_input(id_n_weight):
+        (id, weight) = id_n_weight
+        return sense_funcs[Senses(id)](pos) * weight
+
     actions = []
-    for action, sensory in brain.items():
-        inputVal = tanh(sum(map(
-            # Please refactor this sometime
-            lambda id_weight: sensory_evaluations[id_weight[0]](
-                pos) * id_weight[1],
-            sensory)))
-        if abs(inputVal) > 0.5:
-            actions.append(action)
+    for action_index, input in brain.items():
+        inputVal = tanh(sum(map(get_input, input)))
+        # it has to be positive, and then it has a chance of happening
+        if inputVal >= 0 and inputVal >= random():
+            # take raw index and put in enum
+            actions.append(Actions(action_index))
     return actions
-
-
-def act(action_ids, pos):
-    # We pass the state in to mutate
-    # it would be better to make it immutable,
-    # but that has performance and write implementations
-    # the only benefit is using lambdas, which i can't do with mutation
-    for id in action_ids:
-        actions[id](pos)
