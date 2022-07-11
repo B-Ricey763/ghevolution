@@ -25,6 +25,6 @@ def draw_brain(gene):
             colors.append('yellow')
         else:
             colors.append('red')
-    plt.subplot(1, 2, 1)
-    nx.draw_planar(g, node_color=colors, **options)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    nx.draw_planar(g, node_color=colors, ax=ax, label="hello", **options)
     plt.savefig('brain_graph.png')

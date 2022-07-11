@@ -9,6 +9,7 @@ import neural_network
 import genome
 from dataclasses import dataclass
 from settings import *
+import settings
 import world_view
 from actions import action_funcs
 import numpy as np
@@ -45,6 +46,9 @@ def start_generation(genes, gen_num):
         is_displaying = True
         screen = world_view.init_display()
 
+    if NUM_GENERATIONS // 2 == gen_num:
+        settings.TOP_BOUND = 20
+
     for i in range(STEPS_PER_GEN):
         # we are currying the step function to send more info
         step(brains, positions)
@@ -79,22 +83,32 @@ def get_survivors(brains, positions):
     sorted_genes = sorted(
         surviving_genes, key=surviving_genes.get, reverse=True)
     best_genes = []
-    for i, gene in enumerate(sorted_genes):
-        if i % 2 == 1 and len(best_genes) < NUM_ORGANISMS:
-            (new1, new2) = crossover(sorted_genes[i - 1], gene)
-            best_genes.append(new1)
-            best_genes.append(new2)
+    # for i, gene in enumerate(sorted_genes):
+    #     if i % 2 == 1 and len(best_genes) < NUM_ORGANISMS:
+    #         (new1, new2) = crossover(sorted_genes[i - 1], gene)
+    #         best_genes.append(new1)
+    #         best_genes.append(new2)
 
-    # the above for loop is not guaranteed to fill everything for the next
-    # generation so we just reuse the best genes from the last
-    i = 0
-    while len(best_genes) < NUM_ORGANISMS and i < len(sorted_genes):
-        best_genes.append(sorted_genes[i])
-        i += 1
+    # # the above for loop is not guaranteed to fill everything for the next
+    # # generation so we just reuse the best genes from the last
+    # i = 0
+    # while len(best_genes) < NUM_ORGANISMS and i < len(sorted_genes):
+    #     best_genes.append(sorted_genes[i])
+    #     i += 1
 
-    # If we still need more we just fill it randomly
+    # # If we still need more we just fill it randomly
+    # while len(best_genes) < NUM_ORGANISMS:
+    #     best_genes.append(genome.generate())
     while len(best_genes) < NUM_ORGANISMS:
-        best_genes.append(genome.generate())
+        gene1 = sorted_genes[randrange(len(sorted_genes))]
+        gene2 = sorted_genes[randrange(len(sorted_genes))]
+        (c1, c2) = crossover(gene1, gene2)
+        best_genes.append(c1)
+        best_genes.append(c2)
+
+    for gene in best_genes:
+        if random() < MUTATION_CHANCE:
+            gene = genome.mutate(gene)
 
     # last param is best gene
     return (best_genes, total_survivors, sorted_genes[0])
@@ -106,7 +120,7 @@ def fitness_score(position):
 
 
 def survivor_condition(position):
-    return position.x < LEFT_BOUND and position.y < TOP_BOUND
+    return position.x < LEFT_BOUND and position.y < settings.TOP_BOUND
 
 
 # ITS A GLOBAL var i know but we want performance

@@ -4,8 +4,8 @@ from turtle import pos
 from matplotlib.pyplot import draw
 import pygame
 
-
 from settings import *
+import settings
 
 black = 0, 0, 0
 display_size = (X_SIZE + 1) * CELL_SIZE, (Y_SIZE + 1) * CELL_SIZE
@@ -26,9 +26,9 @@ def update_display(screen, brains, positions, gen_num):
             sys.exit()
     screen.fill(black)
     pygame.draw.line(screen, (255, 255, 255), (LEFT_BOUND * CELL_SIZE, 0),
-                     (LEFT_BOUND * CELL_SIZE, TOP_BOUND * CELL_SIZE), 2)
-    pygame.draw.line(screen, (255, 255, 255), (0, TOP_BOUND * CELL_SIZE),
-                     (LEFT_BOUND * CELL_SIZE, TOP_BOUND * CELL_SIZE), 2)
+                     (LEFT_BOUND * CELL_SIZE, settings.TOP_BOUND * CELL_SIZE), 2)
+    pygame.draw.line(screen, (255, 255, 255), (0, settings.TOP_BOUND * CELL_SIZE),
+                     (LEFT_BOUND * CELL_SIZE, settings.TOP_BOUND * CELL_SIZE), 2)
 
     text = font.render("Generation: " + str(gen_num), True, (255, 255, 255))
     textRect = text.get_rect()
