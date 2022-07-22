@@ -1,22 +1,28 @@
 from math import floor
 import sys
-from turtle import pos
 from matplotlib.pyplot import draw
 import pygame
+import bounds
 
 from settings import *
 import settings
 
 black = 0, 0, 0
+white = 255, 255, 255
 display_size = (X_SIZE + 1) * CELL_SIZE, (Y_SIZE + 1) * CELL_SIZE
 font = None
+screen = None
+initialized = False
 
 
 def init_display():
-    global font
-    pygame.init()
-    font = pygame.font.Font('freesansbold.ttf', 32)
-    return pygame.display.set_mode(display_size)
+    global font, initialized, screen
+    if not initialized:
+        pygame.init()
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        initialized = True
+        screen = pygame.display.set_mode(display_size)
+    return screen
 
 
 def update_display(screen, brains, positions, gen_num):
@@ -25,10 +31,19 @@ def update_display(screen, brains, positions, gen_num):
         if event.type == pygame.QUIT:
             sys.exit()
     screen.fill(black)
-    pygame.draw.line(screen, (255, 255, 255), (LEFT_BOUND * CELL_SIZE, 0),
-                     (LEFT_BOUND * CELL_SIZE, settings.TOP_BOUND * CELL_SIZE), 2)
-    pygame.draw.line(screen, (255, 255, 255), (0, settings.TOP_BOUND * CELL_SIZE),
-                     (LEFT_BOUND * CELL_SIZE, settings.TOP_BOUND * CELL_SIZE), 2)
+    (pt1, pt2) = bounds.get_bounds()
+    # Left vert line
+    pygame.draw.line(screen, white, (pt1.x * CELL_SIZE, pt1.y * CELL_SIZE),
+                     (pt1.x * CELL_SIZE, pt2.y * CELL_SIZE), 2)
+    # Right vert line
+    pygame.draw.line(screen, white, (pt2.x * CELL_SIZE, pt1.y * CELL_SIZE),
+                     (pt2.x * CELL_SIZE, pt2.y * CELL_SIZE), 2)
+    # bottom line
+    pygame.draw.line(screen, white, (pt1.x * CELL_SIZE, pt2.y * CELL_SIZE),
+                     (pt2.x * CELL_SIZE, pt2.y * CELL_SIZE), 2)
+    # top line
+    pygame.draw.line(screen, white, (pt1.x * CELL_SIZE, pt1.y * CELL_SIZE),
+                     (pt2.x * CELL_SIZE, pt1.y * CELL_SIZE), 2)
 
     text = font.render("Generation: " + str(gen_num), True, (255, 255, 255))
     textRect = text.get_rect()
