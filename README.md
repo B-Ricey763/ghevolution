@@ -15,9 +15,9 @@ That should get all of the dependencies. Use this command to run:
 poetry run python ghevolution
 ```
 This will display the pygame window with the generations. There was also a visualizer of the brains and survivor graphs, but I can't get that to work 2 years later and I can't be bothered to fix it, but if you want to see what those looked like, there are still some in the repo:
-![brain_graph.png]
+![brain_graph.png](/brain_graph.png)
 Here is the brain, a graph with different weights that is randomly generated at the beginning and evolves over time
-![survivor_graph.png]
+![survivor_graph.png](/survivor_graph.png)
 This graph shows that over time more organisms surive. At first, those who live are random, but over time all of the organisms get the best geners
 
 For a more theoretical overview, you can watch [this video](https://youtu.be/N3tRFayqVtk). It is one of my favorite videos on YouTube, please do yourself a favor and watch it!
